@@ -9,10 +9,6 @@ Thumbs.db
 
 # Environment variables
 .env
-.env.*
-!.env.example
-*.bak*
-deploy.ps1
 .env.local
 .env.development.local
 .env.test.local

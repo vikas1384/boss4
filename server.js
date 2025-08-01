@@ -1,61 +1,62 @@
-require('dotenv').config();
+// Load environment variables based on environment
+require('dotenv').config({
+  path: process.env.NODE_ENV === 'production' ? '.env.production' : '.env'
+});
 
 const express = require('express');
 const path = require('path');
-const helmet = require('helmet');
 const compression = require('compression');
-const rateLimit = require('express-rate-limit');
 const cors = require('cors');
+const rateLimit = require('express-rate-limit');
+const helmet = require('helmet');
 
 const app = express();
-const PORT = process.env.PORT || 3000;
-const isProduction = process.env.NODE_ENV === 'production';
+const PORT = process.env.PORT || 8000;
 
-// Security middleware
-app.use(helmet({
-    contentSecurityPolicy: {
-        directives: {
-            defaultSrc: ["'self'"],
-            scriptSrc: ["'self'", "'unsafe-inline'", 'cdnjs.cloudflare.com', 'unpkg.com'],
-            styleSrc: ["'self'", "'unsafe-inline'", 'cdnjs.cloudflare.com'],
-            imgSrc: ["'self'", 'data:', 'blob:'],
-            connectSrc: ["'self'", 'api.groq.com', 'api.perplexity.ai', 'generativelanguage.googleapis.com']
-        }
-    }
-}));
+// Security middlewares
+app.use(helmet());
+app.use(cors());
 
 // Rate limiting
-const apiLimiter = rateLimit({
-    windowMs: parseInt(process.env.RATE_LIMIT_WINDOW_MS) || 900000, // 15 minutes
-    max: parseInt(process.env.RATE_LIMIT_MAX_REQUESTS) || 100
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100 // limit each IP to 100 requests per windowMs
 });
+app.use('/api/', limiter);
 
-// Middleware
+// Compression for better performance
 app.use(compression());
-app.use(cors());
-app.use(express.json());
 
-// Serve static files from dist in production
-app.use(express.static(isProduction ? path.join(__dirname, 'dist') : __dirname));
-
-// API keys middleware with rate limiting
-app.get('/api/keys', apiLimiter, (req, res) => {
-    // Basic API key validation
-    if (!process.env.GROQ_API_KEY && !process.env.PERPLEXITY_API_KEY && !process.env.GEMINI_API_KEY) {
-        return res.status(500).json({ error: 'API keys not configured' });
+// Serve static files with cache control
+app.use(express.static(__dirname, {
+  maxAge: '1d',
+  setHeaders: (res, path) => {
+    if (path.endsWith('.html')) {
+      res.setHeader('Cache-Control', 'no-cache');
     }
+  }
+}));
 
-    try {
-        res.json({
-            groq: process.env.GROQ_API_KEY || '',
-            perplexity: process.env.PERPLEXITY_API_KEY || '',
-            gemini: process.env.GEMINI_API_KEY || ''
-        });
-    } catch (error) {
-        console.error('Error providing API keys:', error);
-        res.status(500).json({ error: 'Internal server error' });
-    }
+// API keys middleware with authentication
+app.get('/api/keys', (req, res) => {
+  // Implement proper authentication check here
+  if (!isAuthenticated(req)) {
+    return res.status(401).json({ error: 'Unauthorized' });
+  }
+  
+  // Only provide keys in a secure way
+  res.json({
+    groq: process.env.GROQ_API_KEY || '',
+    perplexity: process.env.PERPLEXITY_API_KEY || '',
+    gemini: process.env.GEMINI_API_KEY || ''
+  });
 });
+
+// Simple authentication check - Replace with your actual auth logic
+function isAuthenticated(req) {
+  // In production, implement proper session/token validation
+  return process.env.NODE_ENV !== 'production' || req.headers['x-api-key'] === process.env.API_SECRET;
+}
 
 // Handle all routes by serving index.html
 app.get('*', (req, res) => {
