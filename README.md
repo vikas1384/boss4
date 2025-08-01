@@ -8,6 +8,65 @@ Arogya AI is a compassionate, culturally-aware AI medical assistant designed for
 
 ## 🌟 Features
 
+- Multi-language support (English, Hindi, Marathi, Kannada)
+- Professional medical assessment generation
+- PDF report generation
+- Emergency detection and alerts
+- Responsive design for all devices
+
+## 🚀 Deployment
+
+### Prerequisites
+- Node.js (>=14.0.0)
+- NPM or Yarn
+
+### Local Development
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/vikas1384/boss4.git
+   cd boss4
+   ```
+
+2. Install dependencies:
+   ```bash
+   npm install
+   ```
+
+3. Set up environment variables:
+   - Copy `.env.example` to `.env`
+   - Add your API keys for GROQ, Perplexity, and Gemini
+
+4. Start development server:
+   ```bash
+   npm run dev
+   ```
+
+### Production Deployment
+
+#### Render Deployment
+1. Fork this repository
+2. Create a new Web Service on Render
+3. Connect your GitHub repository
+4. Add environment variables in Render dashboard
+5. Deploy!
+
+#### Manual Production Deployment
+1. Set production environment:
+   ```bash
+   cp .env.example .env.production
+   ```
+2. Add production API keys to `.env.production`
+3. Start production server:
+   ```bash
+   npm run production
+   ```
+
+## 🔒 Security
+- All API keys are stored securely
+- Environment variables are properly handled
+- Rate limiting implemented
+- Helmet.js for security headers
+
 - **Accessible Health Information**: Provides reliable health information in a conversational format accessible to users with varying levels of health literacy.
 
 - **Multilingual Support**: Offers support in multiple Indian languages (English, Hindi, Marathi, Kannada) to reach a broader audience.

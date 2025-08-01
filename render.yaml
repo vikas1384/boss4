@@ -1,0 +1,17 @@
+services:
+  - type: web
+    name: arogya-ai
+    env: node
+    buildCommand: npm install
+    startCommand: node server.js
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 3000
+      - key: GROQ_API_KEY
+        sync: false
+      - key: PERPLEXITY_API_KEY
+        sync: false
+      - key: GEMINI_API_KEY
+        sync: false
