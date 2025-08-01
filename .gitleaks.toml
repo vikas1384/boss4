@@ -1,0 +1,39 @@
+# Gitleaks configuration file
+title = "Gitleaks Config"
+
+[extend]
+# useDefault will extend the base configuration with the default gitleaks config:
+# https://github.com/zricethezav/gitleaks/blob/master/config/gitleaks.toml
+useDefault = true
+
+[[rules]]
+id = "api-key"
+description = "API Key"
+regex = '''(?i)((api[_-]?key|apikey|api_key_secret|api_secret|api[_-]?secret|app[_-]?key|app[_-]?secret|application[_-]?key|auth[_-]?key|authentication[_-]?key|access[_-]?key|access[_-]?token|auth[_-]?token|oauth[_-]?token|bearer[_-]?token)["\s]*[:=>\s]+["\s]*[\w\-+=]{16,})'''
+secretGroup = 1
+entropy = 3.5
+keywords = [
+    "api[_-]?key",
+    "apikey",
+    "api_key_secret",
+    "api[_-]?secret",
+    "app[_-]?key",
+    "app[_-]?secret",
+    "application[_-]?key",
+    "auth[_-]?key",
+    "authentication[_-]?key",
+    "access[_-]?key",
+    "access[_-]?token",
+    "auth[_-]?token",
+    "oauth[_-]?token",
+    "bearer[_-]?token"
+]
+
+[allowlist]
+description = "Allowlist certain files and paths"
+paths = [
+    '''(?i)^\.gitleaks\.toml$''',
+    '''(?i)^\.env\.example$''',
+    '''(?i)^test/''',
+    '''(?i)^examples/'''
+]
